@@ -1,0 +1,13 @@
+[
+{"id":"1","roleMaxLevel":"1","rewardInfos":"1000,5;600,15;300,80"},
+{"id":"2","roleMaxLevel":"5","rewardInfos":"1000,5;600,15;300,80"},
+{"id":"3","roleMaxLevel":"10","rewardInfos":"1000,10;600,20;300,70"},
+{"id":"4","roleMaxLevel":"15","rewardInfos":"1500,8;900,22;500,70"},
+{"id":"5","roleMaxLevel":"20","rewardInfos":"2000,10;1200,30;600,60"},
+{"id":"6","roleMaxLevel":"25","rewardInfos":"3000,8;2000,22;1000,70"},
+{"id":"7","roleMaxLevel":"30","rewardInfos":"6000,8;4000,27;2000,65"},
+{"id":"8","roleMaxLevel":"35","rewardInfos":"10000,8;6500,22;3000,70"},
+{"id":"9","roleMaxLevel":"40","rewardInfos":"15000,7;10000,20;6000,73"},
+{"id":"10","roleMaxLevel":"45","rewardInfos":"20000,5;14000,15;7500,80"},
+{"id":"11","roleMaxLevel":"50","rewardInfos":"30000,3;18000,17;9000,80"}
+]
