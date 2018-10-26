@@ -62,7 +62,12 @@ cc.Class({
     },
 
     onNetClosed(event){
-        cc.log("net closed.");
+        cc.log("net closed. 5s 后重试连接.");
+        this.scheduleOnce((dt)=>{
+            if (!Global.netProxy.isNetworkOpened()){
+                Global.netProxy.connect();
+            }
+        }, 5);
     },
 
     onLoginSuc(event){
@@ -76,7 +81,10 @@ cc.Class({
     },
 
     onLoginFailed(event){
-        cc.log("登陆失败.");
+        cc.log("登陆失败. 5s后重试.");
+        this.scheduleOnce((dt)=>{
+            Global.netProxy.login(0);
+        }, 5)
     },
 
     startBeatHeart(){
