@@ -16,7 +16,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        chessLayer: cc.Node,
+        chessboard: cc.Node,
         hole: cc.Node,
         chessPrefab: cc.Prefab,
         chessBedPrefab: cc.Prefab,
@@ -191,7 +191,7 @@ cc.Class({
         this.chessArr = [];
         this.isBlack = false;    // 是否黑色
         this.order = false;      // 是否轮到自己走棋
-        this.chessLayer.removeAllChildren(true);
+        this.chessboard.removeAllChildren(true);
 
         // 棋盘坐标节点 用来定位点击
         for (let i=0; i<bedPos.length; i++){
@@ -200,7 +200,7 @@ cc.Class({
             let bedCtrl = bed.getComponent("ChessBedCtrl");
             bedCtrl.index = i;
             this.bedArr.push(bedCtrl);
-            this.chessLayer.addChild(bed);
+            this.chessboard.addChild(bed);
         }
     },
 
@@ -221,7 +221,7 @@ cc.Class({
             } else {
                 chessCtrl.isBlack = true;
             }
-            this.chessLayer.addChild(chess);
+            this.chessboard.addChild(chess);
         }
 
         if (DataMgr.getInstance().playerObj.uid == info.black){
@@ -231,7 +231,7 @@ cc.Class({
         } else {
             this.isBlack = false;
             this.order = false;
-            // this.chessLayer.scaleY = -1;
+            this.chessboard.parent.scaleY = -1;
         }
         this._updatePlayTip();
         this.labelSelfUid.string = "我方 : " + (this.isBlack?"黑色":"白色") + DataMgr.getInstance().playerObj.uid;
@@ -249,6 +249,10 @@ cc.Class({
         let other = resp.other;
 
         this.isBlack = self.isBlack;
+
+        if (!this.isBlack){
+            this.chessboard.parent.scaleY = -1;
+        }
 
         this.labelOtherUid.string = "对手: " + (!this.isBlack?"黑色":"白色")   +  resp.other.uid;
         this.labelSelfUid.string = "我方: " + (this.isBlack?"黑色":"白色") + uid;
@@ -272,7 +276,7 @@ cc.Class({
                 }
                 chess.setPosition(cc.v2(bed.x, bed.y));
                 this.chessArr[parseInt(cid)] = (chessCtrl);
-                this.chessLayer.addChild(chess);
+                this.chessboard.addChild(chess);
             }
         }
     }
