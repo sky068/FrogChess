@@ -12,13 +12,15 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        chessSp: cc.Node,
+        chessTip: cc.Node,  // 选中提示
         isBlack: {
             default: true,
             notify: function(){
                 if (this.isBlack){
-                    this.node.getChildByName("chess").color = cc.Color.BLACK;
+                    this.chessSp.color = cc.Color.BLACK;
                 } else{
-                    this.node.getChildByName("chess").color = cc.Color.WHITE;
+                    this.chessSp.color = cc.Color.WHITE;
                 }
             }
         },
@@ -28,7 +30,18 @@ cc.Class({
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad () {
+        Global.eventMgr.on("unselect_chess", this.onUnselect, this);
+    },
+
+    onUnselect(event){
+        this.chessTip.active = false;
+    },
+
+    select(){
+        Global.eventMgr.emit("unselect_chess");
+        this.chessTip.active = true;
+    },
 
     start () {
         this.node.on(cc.Node.EventType.TOUCH_END, this.onChessTouch, this);

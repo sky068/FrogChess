@@ -86,8 +86,11 @@ let NetProxy = cc.Class({
      * @param {String} key
      * @param {function(resp)} cb
      */
-    registerPush(key, cb){
+    registerPush(key, cb, target){
         let self = this;
+        if (cb && target){
+            cb = cb.bind(target);
+        }
         let pushCallback = function (resp) {
             if (cb){
                 cb(resp);
@@ -139,6 +142,12 @@ let NetProxy = cc.Class({
         req.lastBedIndex = msg.lastBedIndex;
         req.cid = msg.cid;
         req.dest = msg.dest;
+        this.network.sendRequest(req);
+    },
+
+    selectChess: function (msg) {
+        let req = new GameProtocols.SelectChessRequest();
+        req.cid = msg.cid;
         this.network.sendRequest(req);
     },
 

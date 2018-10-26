@@ -141,6 +141,31 @@ let ChatRequest = cc.Class({
     }
 });
 
+let PushChat = cc.Class({
+    extends: BaseResponse,
+    ctor(){
+        this.act = 'chat';
+        this.msg = '';
+        this.uid = '';
+    }
+});
+
+let SelectChessRequest = cc.Class({
+    extends: BaseRequest,
+    ctor() {
+        this.act = "selectChess";
+        this.cid = 0;
+    }
+});
+
+let PushSelectChess = cc.Class({
+    extends: BaseResponse,
+    ctor() {
+        this.act = "selectChess";
+        this.cid = 0;
+    }
+});
+
 let LoginRequest = cc.Class({
     extends: BaseRequest,
 
@@ -419,15 +444,6 @@ let PushExitRoom = cc.Class({
     }
 });
 
-let PushChat = cc.Class({
-    extends: BaseResponse,
-    ctor(){
-        this.act = 'chat';
-        this.msg = '';
-        this.uid = '';
-    }
-});
-
 
 /**
  * 推送消息 推送消息好友已赠送体力
@@ -563,6 +579,7 @@ let response_classes = {
     chat: PushChat,
     exitRoom: PushExitRoom,
     playChess: PushPlayChess,
+    selectChess: PushSelectChess,
     sendSpNotify: PushSendSpResponse,
     takeSpNotify: PushTakeSpResponse,
     friendInfoSync: PushSyncFriendInfo,
@@ -588,6 +605,7 @@ module.exports = {
     RandomMatchRequest: RandomMatchRequest,
     RandomMatchResponse: RandomMatchResponse,
     PlayChessRequest: PlayChessRequest,
+    SelectChessRequest: SelectChessRequest,
 
     // debug
     DebugChangeMeRequest: DebugChangeMeRequest,

@@ -126,10 +126,20 @@ class LoginResponse extends BaseResponse{
     }
 }
 
+class PushSelectChess extends BaseResponse{
+    constructor(cid){
+        super();
+        this.data = {
+            cid: cid,
+        }
+    }
+}
+
 
 module.exports = {
     LoginResponse: LoginResponse,
     RandomMatchResponse: RandomMatchResponse,
     PushPlayChess: PushPlayChess,
     PushExitRoom: PushExitRoom,
+    PushSelectChess: PushSelectChess,
 }

@@ -84,6 +84,10 @@ class Game {
                 Game.getInstance().login(socket, request);
                 break;
             }
+            case 'selectChess':{
+                Game.getInstance().selectChess(socket, request);
+                break;
+            }
             default:
                 break;
         }
@@ -266,6 +270,17 @@ class Game {
             }
         }
     
+        room.send(JSON.stringify(resp));
+    }
+
+    selectChess(socket, request){
+        let resp = new Protocol.PushSelectChess(request.data.cid);
+        resp.act = request.act;
+        resp.seq = request.seq;
+
+        let rid = socket.rid;
+        let room = RAND_ROOM_DIC[rid.toString()];
+
         room.send(JSON.stringify(resp));
     }
 }

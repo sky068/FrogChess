@@ -38,6 +38,7 @@ cc.Class({
         Global.eventMgr.on(Global.config.EVENT_EXITROOM, this.onExitRoom, this);
         Global.eventMgr.on(Global.config.EVENT_PLAYCHESS, this.onPlayChess, this);
 
+        Global.netProxy.registerPush("selectChess", this.onSelectChess, this);
     },
 
     start () {
@@ -46,6 +47,11 @@ cc.Class({
     onExitRoom(event){
         let resp = event.detail;
         cc.log(resp.uid + " leave game.");
+    },
+
+    onSelectChess(resp){
+        let cid = resp.cid;
+        this.chessArr[parseInt(cid)].select();
     },
 
     onPlayChess(event){
@@ -101,6 +107,7 @@ cc.Class({
             this.curChess = null;
             return;
         }
+        Global.netProxy.selectChess({cid: chess.cid});
         this.curChess = chess;
     },
 
