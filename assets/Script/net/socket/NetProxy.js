@@ -151,6 +151,17 @@ let NetProxy = cc.Class({
         this.network.sendRequest(req);
     },
 
+    createRoom: function (cb) {
+        let req = new GameProtocols.CreateRoomRequest();
+        this.network.sendRequest(req, cb);
+    },
+
+    joinRoom: function (rid) {
+        let req = new GameProtocols.JoinRoomRequest();
+        req.rid = rid;
+        this.network.sendRequest(req);
+    },
+
     /**
      * Facebook或者游客登录接口
      * @param {Object.<LoginOriginType>} origin

@@ -7,27 +7,31 @@ const SOCKET_CLOSED = 3;
 let Protocol = require('./protocol');
 
 class Room {
-    constructor(u1, u2){
+    constructor(){
         this.userArr = [];
         this.userDic = {};
-        this.userArr.push(u1);
-        this.userArr.push(u2);
-        this.userDic[u1.uid.toString()] = u1;
-        this.userDic[u2.uid.toString()] = u2;
         this.rid = 0;
         this.order = 0;     // 当前走棋的uid
         this.chessPanelFlag = [0,0,0,0,0];     // 标记棋牌位置，0表示没有棋子 1表示已经有棋子
     }
 
-    // addUser(user){
-    //     this.userArr.push(user);
-    //     this.userDic[user.uid.toString()] = user;
-    // }
-
-    createRid(){
-        this.rid = Date.now();
+    addUser(user){
+        this.userArr.push(user);
+        this.userDic[user.uid.toString()] = user;
     }
 
+    createRid(rid){
+        if (!rid){
+            this.rid = Date.now();
+        } else{
+            this.rid = rid;
+        }
+    }
+
+    /**
+     * 
+     * @param {String} msg 
+     */
     send(msg){
         for (let user of this.userArr){
             if (user.socket.readyState == SOCKET_OPEN){

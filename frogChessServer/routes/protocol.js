@@ -136,6 +136,15 @@ class PushSelectChess extends BaseResponse{
     }
 }
 
+class CreateRoomResponse extends BaseResponse{
+    constructor(){
+        super();
+        this.data = {
+            rid: 0
+        }
+    }
+}
+
 
 module.exports = {
     LoginResponse: LoginResponse,
@@ -143,4 +152,5 @@ module.exports = {
     PushPlayChess: PushPlayChess,
     PushExitRoom: PushExitRoom,
     PushSelectChess: PushSelectChess,
+    CreateRoomResponse: CreateRoomResponse,
 }

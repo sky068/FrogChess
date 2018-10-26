@@ -115,6 +115,14 @@ let CreateRoomResponse = cc.Class({
     }
 });
 //-------------------------------------------------------
+let JoinRoomRequest = cc.Class({
+    extends: BaseRequest,
+    ctor(){
+        this.act = "joinRoom";
+        this.rid = 0;
+    }
+});
+//-------------------------------------------------------
 let PlayChessRequest = cc.Class({
     extends: BaseRequest,
     ctor(){
@@ -520,6 +528,7 @@ let response_classes = {
     rankboard: RankResponse,
     heart: HeartResponse,
     rmatch: RandomMatchResponse,
+    createRoom: CreateRoomResponse,
 
     //push
     chat: PushChat,
@@ -550,6 +559,9 @@ module.exports = {
     RandomMatchResponse: RandomMatchResponse,
     PlayChessRequest: PlayChessRequest,
     SelectChessRequest: SelectChessRequest,
+    CreateRoomRequest: CreateRoomRequest,
+    CreateRoomResponse: CreateRoomResponse,
+    JoinRoomRequest:JoinRoomRequest,
 
     // debug
     DebugChangeMeRequest: DebugChangeMeRequest,

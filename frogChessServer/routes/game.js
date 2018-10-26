@@ -10,6 +10,7 @@
  * 
  */
 
+
 const SOCKET_CONNECTING = 0;
 const SOCKET_OPEN = 1;
 const SOCKET_CLOSING = 2;
@@ -85,8 +86,16 @@ class Game {
                 Game.getInstance().login(socket, request);
                 break;
             }
-            case 'selectChess':{
+            case 'selectChess': {
                 Game.getInstance().selectChess(socket, request);
+                break;
+            }
+            case 'createRoom': {
+                Game.getInstance().createNewRoom(socket, request);
+                break;
+            }
+            case 'joinRoom': {
+                Game.getInstance().joinRoom(socket, request);
                 break;
             }
             default:
@@ -127,7 +136,7 @@ class Game {
         let rid = LAST_IN_ROOM_ID[uid.toString()];
         if (rid){
             let room = GAME_ROOM_DIC[rid.toString()];
-            if (room){
+            if (room && room.userArr.length >= 2){
                 // 把双方的信息发过去
                 let self = room.getUser(uid);
                 let other = room.getRival(uid);
@@ -143,11 +152,13 @@ class Game {
                 resp.data.rid = rid;
                 resp.data.order = room.order;
                 resp.data.isReconn = true;
+            } else{
+                let user = new User(socket, uid);
+                 ONLINE_USER_DIC[uid.toString()] = user;
             }
             
         } else{
             let user = new User(socket, uid);
-
             ONLINE_USER_DIC[uid.toString()] = user;
         }
 
@@ -167,7 +178,9 @@ class Game {
         console.log("random pool size: " + RANDOM_USER_POOL.length);
         if (RANDOM_USER_POOL.length > 0){
             let other = RANDOM_USER_POOL.shift();
-            let aRoom = new Room(user, other);
+            let aRoom = new Room();
+            aRoom.addUser(user);
+            aRoom.addUser(other);
             aRoom.createRid();
             GAME_ROOM_DIC[aRoom.rid.toString()] = aRoom;
             // 方便断线重连时快速找到之前的房间
@@ -284,6 +297,80 @@ class Game {
         room.selectChess(request.data.cid);
 
         room.send(JSON.stringify(resp));
+    }
+
+    createNewRoom(socket, request){
+        // 用户只要调用过login则已经把uid绑定到socket上面, 否则就是没有登录成功.
+        let user = new User(socket, socket.uid);
+        let aRoom = new Room();
+        aRoom.createRid();
+        aRoom.addUser(user);
+        user.socket.rid = aRoom.rid;
+        GAME_ROOM_DIC[aRoom.rid.toString()] = aRoom;
+            // 方便断线重连时快速找到之前的房间
+        LAST_IN_ROOM_ID[user.uid.toString()] = aRoom.rid;
+
+        let resp = new Protocol.CreateRoomResponse();
+        resp.act = request.act;
+        resp.seq = request.seq;
+        resp.data.rid = aRoom.rid;
+
+        aRoom.send(JSON.stringify(resp));
+    }
+
+    joinRoom(socket, request){
+
+        let rid = request.data.rid;
+
+        let room = GAME_ROOM_DIC[rid.toString()];
+        if (!room){
+            console.log("room " + rid + " 不存在.");
+            return;
+        } else{
+            let resp = new Protocol.RandomMatchResponse("rmatch", 1);
+
+            let userNew = new User(socket, socket.uid);
+            userNew.socket.rid = rid;
+            room.addUser(userNew);
+            LAST_IN_ROOM_ID[userNew.uid.toString()] = rid;
+
+            let userOld = room.getRival(socket.uid);
+    
+            if (Math.random() < 0.5){
+                resp.data.black = userNew.uid;
+                resp.data.other = userOld.uid;
+                userNew.isBlack = true;
+                room.order = userNew.uid;
+                createUserChess(userNew, userOld);
+            } else{
+                resp.data.black = userOld.uid;
+                resp.data.other = userNew.uid;
+                userOld.isBlack = true;
+                room.order = userOld.uid;
+                createUserChess(userOld, userNew);
+            }
+    
+            function createUserChess(blackUser, whiteUser){
+                // 创建黑色棋子id 2 3
+                for (let i=2; i<=3; i++){
+                    let chess = new Chess(i,i, true);
+                    blackUser.chessDic[i.toString()] = chess;
+                    room.chessPanelFlag[i] = 1;
+                }
+    
+                // 创建白色棋子id 0 1
+                for (let i=0; i<=1; i++){
+                    let chess = new Chess(i,i, false);
+                    whiteUser.chessDic[i.toString()] = chess;
+                    room.chessPanelFlag[i] = 1;
+                }
+            }
+    
+            resp.data.order = resp.data.black;  // 黑子先走棋
+
+            room.send(JSON.stringify(resp));
+        }
+
     }
 }
 

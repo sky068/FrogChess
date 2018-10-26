@@ -17,6 +17,8 @@ cc.Class({
         tips: cc.Node,
         menuLayer: cc.Node,
         gameLayer: cc.Node,
+        editBox: cc.EditBox,
+        inputTips: cc.Node,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -115,10 +117,16 @@ cc.Class({
 
     onBtnNewRoom(){
         cc.log("开房间");
+        Global.netProxy.createRoom((resp)=>{
+            cc.log("开房成功，房间号: " + resp.rid);
+            this.getComponent("GameCtrl").labelRid.string = resp.rid;
+            this.showGameLayer();
+        });
     },
-    
+
     onBtnJoinRoom(){
         cc.log("加入房间");
+        this.inputTips.active = true;
     },
 
     checkInternet(){
@@ -133,6 +141,12 @@ cc.Class({
     showMenuLayer(){
         this.gameLayer.active = false;
         this.menuLayer.active = true;
+    },
+
+    onBtnInputRoom(){
+        let rid = this.editBox.string;
+        Global.netProxy.joinRoom(rid);
+        this.inputTips.active = false;
     }
 
     // update (dt) {},

@@ -86,6 +86,7 @@ cc.Class({
                 if (resp.winner != uid){
                     txt = "你输了!";
                 }
+                this.clearChessboard();
                 Global.tips.show(txt, ()=>{
                     this.getComponent("MenuCtrl").showMenuLayer();
                 });
