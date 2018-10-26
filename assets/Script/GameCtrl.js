@@ -23,6 +23,7 @@ cc.Class({
         labelSelfUid: cc.Label,
         labelOtherUid: cc.Label,
         labelOrderUid: cc.Label,
+        labelRid: cc.Label,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -235,6 +236,7 @@ cc.Class({
         this._updatePlayTip();
         this.labelSelfUid.string = "我方 : " + (this.isBlack?"黑色":"白色") + DataMgr.getInstance().playerObj.uid;
         this.labelOtherUid.string = "对手: " + (!this.isBlack?"黑色":"白色") + info.other;
+        this.labelRid.string = info.rid;
     },
 
     onReconn(resp){
@@ -250,6 +252,7 @@ cc.Class({
 
         this.labelOtherUid.string = "对手: " + (!this.isBlack?"黑色":"白色")   +  resp.other.uid;
         this.labelSelfUid.string = "我方: " + (this.isBlack?"黑色":"白色") + uid;
+        this.labelRid.string = resp.rid;
         this._updatePlayTip();
 
         createChess.call(this, self.chessDic);

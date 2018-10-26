@@ -140,6 +140,7 @@ class Game {
                 resp.data.other.isBlack = other.isBlack;
                 resp.data.other.uid = other.uid;
 
+                resp.data.rid = rid;
                 resp.data.order = room.order;
                 resp.data.isReconn = true;
             }

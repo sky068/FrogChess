@@ -63,6 +63,7 @@ let BaseResponse = cc.Class({
     }
 });
 
+//-------------------------------------------------------
 let HeartRequest = cc.Class({
     extends: BaseRequest,
     ctor(){
@@ -79,7 +80,7 @@ let HeartResponse = cc.Class({
         this.t = -1;
     }
 });
-
+//-------------------------------------------------------
 let RandomMatchRequest = cc.Class({
     extends: BaseRequest,
     ctor(){
@@ -98,7 +99,21 @@ let RandomMatchResponse = cc.Class({
         this.order = 0;     // 走棋uid
     }
 });
+//-------------------------------------------------------
+let CreateRoomRequest = cc.Class({
+    extends: BaseRequest,
+    ctor(){
+        this.act = "createRoom";
+    }
+});
 
+let CreateRoomResponse = cc.Class({
+    extends: BaseResponse,
+    ctor(){
+        this.act = "createRoom";
+        this.rid = 0;
+    }
+});
 //-------------------------------------------------------
 let PlayChessRequest = cc.Class({
     extends: BaseRequest,
@@ -131,7 +146,6 @@ let PushPlayChess = cc.Class({
     }
 });
 //-------------------------------------------------------
-
 let ChatRequest = cc.Class({
     extends: BaseRequest,
     ctor(){
@@ -149,7 +163,7 @@ let PushChat = cc.Class({
         this.uid = '';
     }
 });
-
+//-------------------------------------------------------
 let SelectChessRequest = cc.Class({
     extends: BaseRequest,
     ctor() {
@@ -165,7 +179,7 @@ let PushSelectChess = cc.Class({
         this.cid = 0;
     }
 });
-
+//-------------------------------------------------------
 let LoginRequest = cc.Class({
     extends: BaseRequest,
 
@@ -265,11 +279,13 @@ let LoginResponse = cc.Class({
 
         this.order = 0;
 
+        this.rid = 0;
+
         this.isReconn = false;  // 是否断线重连
 
     }
 });
-
+//-------------------------------------------------------
 let LogoutRequest = cc.Class({
     extends: BaseRequest,
 
@@ -285,7 +301,7 @@ let LogoutResponse = cc.Class({
         this.act = 'logout';
     }
 });
-
+//-------------------------------------------------------
 /**
  * 绑定fb账号
  * @extends BaseRequest
@@ -323,74 +339,7 @@ let BindFacebookResponse = cc.Class({
         this.friends = 0;
     }
 });
-
-let SpinRequest = cc.Class({
-    extends: BaseRequest,
-
-    ctor: function () {
-        this.act = 'spin';
-
-        /**
-         * 倍数
-         * @type {Number}
-         */
-        this.x = 1;
-    }
-});
-
-let SpinResponse = cc.Class({
-    extends: BaseResponse,
-
-    ctor: function () {
-        this.act = 'spin';
-
-        /**
-         * 摇中的转盘ID
-         */
-        this.hit = 0;
-
-        /**
-         * 转到护盾，但护盾已满时，存在
-         * @type {number}
-         */
-        this.shieldfull = 0;
-
-        /**
-         * 玩家数据对象
-         */
-        this.me = {};
-
-        /**
-         * 他人行星信息对象,仅在转到fire时有效
-         * @type {*}
-         */
-        this.fireTarget = {};
-
-        /**
-         * 偷取对象数据
-         */
-        this.stealTarget = [];
-
-        /**
-         * 离体力下次恢复点的剩余时间秒数
-         * @type {number}
-         */
-        this.spStepLeftTime = 0;
-
-        /**
-         * 体力恢复周期
-         * @type {Number}
-         */
-        this.spInterval = 0;
-
-        /**
-         * 倍数
-         * @type {Number}
-         */
-        this.x = 1;
-    }
-});
-
+//-------------------------------------------------------
 /**
  * 获取排名
  * @extends BaseRequest
@@ -431,8 +380,7 @@ let RankResponse = cc.Class({
 });
 
 
-//push------------------------------------------------------------------------
-
+//----------------------only push------------------------
 let PushExitRoom = cc.Class({
     extends: BaseResponse,
 
@@ -443,8 +391,7 @@ let PushExitRoom = cc.Class({
         this.uid = 0;   // 退出玩家的uid
     }
 });
-
-
+//-------------------------------------------------------
 /**
  * 推送消息 推送消息好友已赠送体力
  * @extends BaseResponse
@@ -461,12 +408,12 @@ var PushSendSpResponse = cc.Class({
         this.friend = null;
     }
 });
-
+//-------------------------------------------------------
 /**
  * 推送消息 推送消息好友已领取赠送的体力
  * @extends BaseResponse
  */
-var PushTakeSpResponse = cc.Class({
+let PushTakeSpResponse = cc.Class({
     extends: BaseResponse,
 
     ctor: function () {
@@ -478,12 +425,12 @@ var PushTakeSpResponse = cc.Class({
         this.friend = null;
     }
 });
-
+//-------------------------------------------------------
 /**
  * 推送消息 同步好友信息
  * @extends BaseResponse
  */
-var PushSyncFriendInfo = cc.Class({
+let PushSyncFriendInfo = cc.Class({
     extends: BaseResponse,
 
     ctor: function () {
@@ -495,7 +442,7 @@ var PushSyncFriendInfo = cc.Class({
         this.friend = null;
     }
 });
-
+//-------------------------------------------------------
 /**
  * debug回调
  * @extends BaseRequest
@@ -569,7 +516,6 @@ let DebugChangeMeResponse = cc.Class({
 let response_classes = {
     login: LoginResponse,
     logout: LogoutResponse,
-    spin: SpinResponse,
     bindFb: BindFacebookResponse,
     rankboard: RankResponse,
     heart: HeartResponse,
@@ -593,8 +539,6 @@ module.exports = {
     LoginResponse: LoginResponse,
     LogoutRequest: LogoutRequest,
     LogoutResponse: LogoutResponse,
-    SpinRequest: SpinRequest,
-    SpinResponse: SpinResponse,
     BindFacebookRequest: BindFacebookRequest,
     BindFacebookResponse: BindFacebookResponse,
     RankRequest: RankRequest,

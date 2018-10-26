@@ -112,7 +112,8 @@ class LoginResponse extends BaseResponse{
         super();
         this.data = {
             order: 0,
-            isReconn: false,
+            isReconn: false,    // 是否游戏中断线重连的
+            rid: 0,
             other: {
                 uid: 0,
                 isBlack: false,
