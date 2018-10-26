@@ -10,6 +10,7 @@ let DataMgr = require("./../../common/DataMgr");
 
 let GAME_SERVER_URL = 'ws://127.0.0.1:3000';
 // GAME_SERVER_URL = 'wss://echo.websocket.org';
+GAME_SERVER_URL = "ws://45.123.197.93:3005";
 
 let NetProxy = cc.Class({
     ctor: function () {

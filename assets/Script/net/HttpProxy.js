@@ -5,10 +5,10 @@
 "use strict";
 
 let GameHttp = require("./GameHttp");
-let DataMgr = require("./../DataMgr");
-let FacebookMgr = require("./../FacebookMgr");
-let UtilsCross = require("./../UtilsCross");
-let Md5 = require("./../encrypt/Md5").md5_hex_hmac;
+let DataMgr = require("./../common/DataMgr");
+let FacebookMgr = require("./../common/FacebookMgr");
+let UtilsCross = require("./../common/UtilsCross");
+let Md5 = require("./../common/encrypt/Md5").md5_hex_hmac;
 
 // let urlroot = "http://localhost:3000";
 let urlroot = "http://52.44.165.172:3000";

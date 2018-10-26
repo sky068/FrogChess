@@ -125,7 +125,6 @@ cc.Class({
      */
     getIsCanMove(desBed){
         return !this.bedFlag[desBed.index] && this.getDesIsInNeighbor(desBed);
-
     },
 
     /**
