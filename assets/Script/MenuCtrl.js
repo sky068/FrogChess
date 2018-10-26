@@ -125,6 +125,11 @@ cc.Class({
 
     onBtnNewRoom(){
         cc.log("开房间");
+        if (!this.checkInternet()){
+            Global.tips.show("网络连接失败，请稍后再试.");
+            return;
+        }
+
         Global.netProxy.createRoom((resp)=>{
             cc.log("开房成功，房间号: " + resp.rid);
             this.getComponent("GameCtrl").labelRid.string = resp.rid;
@@ -134,6 +139,11 @@ cc.Class({
 
     onBtnJoinRoom(){
         cc.log("加入房间");
+        if (!this.checkInternet()){
+            Global.tips.show("网络连接失败，请稍后再试.");
+            return;
+        }
+
         this.inputTips.active = true;
     },
 
