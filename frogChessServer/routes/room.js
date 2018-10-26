@@ -201,6 +201,19 @@ class Room {
         }
         return false;
     }
+
+    // 选中某个棋子
+    selectChess(cid){
+                for (let user of this.userArr){
+            for (let c in user.chessDic){
+                if (cid == c){
+                    user.chessDic[c].isSelected = true;
+                } else{
+                    user.chessDic[c].isSelected = false;
+                }
+            }
+        }
+    }
 }
 
 module.exports = Room;

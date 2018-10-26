@@ -19,7 +19,7 @@ const MATCH_WAIT_TIME = 10;     // 匹配等待时间（默认10秒)
 
 let TIMEOUT_FLAG = {};
 let RANDOM_USER_POOL = [];
-let RAND_ROOM_DIC = {};
+let GAME_ROOM_DIC = {};
 let ONLINE_USER_DIC = {};
 let LAST_IN_ROOM_ID = {};      // 玩家掉线之前所在房间id
 
@@ -33,6 +33,7 @@ class Chess {
         this.cid = cid;
         this.lastBedIndex = lastBedIndex;
         this.isBlack = isBlack;
+        this.isSelected = false;
     }
 }
 
@@ -52,9 +53,9 @@ class Game {
     onDestroyRoom(rid){
         console.log("destroy room: " + rid);
 
-        let room = RAND_ROOM_DIC[rid.toString()];
+        let room = GAME_ROOM_DIC[rid.toString()];
         if (room){
-            delete RAND_ROOM_DIC[rid.toString()];
+            delete GAME_ROOM_DIC[rid.toString()];
         }
     }
 
@@ -102,7 +103,7 @@ class Game {
 
         // 已经在游戏中，通知对方已经掉线
         if (rid) {
-            let room = RAND_ROOM_DIC[rid.toString()];
+            let room = GAME_ROOM_DIC[rid.toString()];
             if (room){
                 console.log('有人中途离开room ' + room.rid);
                 room.leaveRoom(socket);
@@ -125,7 +126,7 @@ class Game {
         // 判断是否在游戏中，是的话恢复连接
         let rid = LAST_IN_ROOM_ID[uid.toString()];
         if (rid){
-            let room = RAND_ROOM_DIC[rid.toString()];
+            let room = GAME_ROOM_DIC[rid.toString()];
             if (room){
                 // 把双方的信息发过去
                 let self = room.getUser(uid);
@@ -167,7 +168,7 @@ class Game {
             let other = RANDOM_USER_POOL.shift();
             let aRoom = new Room(user, other);
             aRoom.createRid();
-            RAND_ROOM_DIC[aRoom.rid.toString()] = aRoom;
+            GAME_ROOM_DIC[aRoom.rid.toString()] = aRoom;
             // 方便断线重连时快速找到之前的房间
             LAST_IN_ROOM_ID[user.uid.toString()] = aRoom.rid;
             LAST_IN_ROOM_ID[other.uid.toString()] = aRoom.rid;
@@ -238,7 +239,7 @@ class Game {
         let rid = socket.rid;
         let uid = request.data.uid;
         let dest = request.data.dest;
-        let room = RAND_ROOM_DIC[rid.toString()];
+        let room = GAME_ROOM_DIC[rid.toString()];
         let resp = new Protocol.PushPlayChess();
         resp.act = request.act;
         resp.seq = request.seq;
@@ -266,7 +267,6 @@ class Game {
                 console.log("game over, " + winner + " win.");
                 // todo: 重新开始，暂时直接销毁房间
                 room.destroyRoom();
-                
             }
         }
     
@@ -279,7 +279,8 @@ class Game {
         resp.seq = request.seq;
 
         let rid = socket.rid;
-        let room = RAND_ROOM_DIC[rid.toString()];
+        let room = GAME_ROOM_DIC[rid.toString()];
+        room.selectChess(request.data.cid);
 
         room.send(JSON.stringify(resp));
     }

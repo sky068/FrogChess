@@ -103,7 +103,7 @@ cc.Class({
 
     onChessTouch(event){
         let chess = event.detail;
-        if (!chess.isBlack == this.isBlack) {
+        if (chess.isBlack != this.isBlack || !this.order) {
             this.curChess = null;
             return;
         }
@@ -264,6 +264,9 @@ cc.Class({
                 let bed = this.bedArr[cobj.lastBedIndex];
                 chessCtrl.lastBedIndex = bed.index;
                 chessCtrl.cid = cobj.cid;
+                if (cobj.isSelected){
+                    chessCtrl.select();
+                }
                 chess.setPosition(cc.v2(bed.x, bed.y));
                 this.chessArr[parseInt(cid)] = (chessCtrl);
                 this.chessLayer.addChild(chess);
