@@ -46,6 +46,8 @@ cc.Class({
         Global.eventMgr.on(Global.config.EVENT_NETWORK_CLOSED, this.onNetClosed, this);
         Global.eventMgr.on(Global.config.EVENT_LOGIN_SUC, this.onLoginSuc, this);
         Global.eventMgr.on(Global.config.EVENT_LOGIN_FAILED, this.onLoginFailed, this);
+
+        Global.netProxy.registerPush("rmatch", this.onRandomMathSuc.bind(this));
     },
 
     start () {
@@ -64,6 +66,11 @@ cc.Class({
     onLoginSuc(event){
         let resp = event.detail;
         cc.log("登陆成功.");
+        if (resp.isReconn){
+            cc.log("断线重连，恢复游戏.");
+            this.getComponent("GameCtrl").onReconn(resp);
+            this.showGameLayer();
+        }
     },
 
     onLoginFailed(event){
@@ -93,15 +100,17 @@ cc.Class({
         }
 
         Global.tips.showLoading();
-        Global.netProxy.randomMatch((resp)=>{
-            Global.tips.hideLoading();
-            if (resp.err != 0){
-                Global.tips.show("匹配失败，请稍后再试.");
-            } else {
-                this.getComponent("GameCtrl").initChessLayer(resp);
-                this.showGameLayer();
-            }
-        });
+        Global.netProxy.randomMatch();
+    },
+
+    onRandomMathSuc(resp){
+        Global.tips.hideLoading();
+        if (resp.err != 0){
+            Global.tips.show("匹配失败，请稍后再试.");
+        } else {
+            this.getComponent("GameCtrl").startNewGame(resp);
+            this.showGameLayer();
+        }
     },
 
     onBtnNewRoom(){

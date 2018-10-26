@@ -1,5 +1,6 @@
 let expressWS = require('express-ws');
-let Work = require('./work');
+let Game = require('./game');
+let EventEmiter = require('events').EventEmitter;
 
 let wsRouter = null;
 
@@ -10,6 +11,7 @@ class WSRouter{
     static getInstance (){
         if (!wsRouter){
             wsRouter = new WSRouter();
+            global.eventEmiter = new EventEmiter();
         }
         return wsRouter;
     }
@@ -29,7 +31,7 @@ class WSRouter{
             socket.on('message', (msg)=>{
                 console.log('on message: ' + msg);
 
-                Work.handleMsg(this, socket, msg);
+                Game.getInstance().handleMsg(this, socket, msg);
             });
 
             socket.on('close', (msg)=>{
@@ -41,7 +43,7 @@ class WSRouter{
                         break;
                     }
                 }
-                Work.dealOffline(socket);
+                Game.getInstance().dealOffline(socket);
                 console.log('clients: ' + this.clients.length);
             });
 

@@ -22,7 +22,7 @@ cc.Class({
                 }
             }
         },
-        lastBedIndex: 0, // 标记上次的位置index（ChessBed index)
+        lastBedIndex: 0, // 标记最新的位置index（ChessBed index)
         cid: 0           // 棋子id
     },
 

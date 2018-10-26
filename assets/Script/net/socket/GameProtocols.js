@@ -104,8 +104,8 @@ let PlayChessRequest = cc.Class({
     extends: BaseRequest,
     ctor(){
         this.act = "playChess";
-        this.uid = 0;
-        this.cid = 0;
+        this.cid = 0;       // 棋子id (用来查找棋子)
+        this.lastBedIndex = 0; // 最新的位置索引 (用来查找位置)
         this.dest =  {
             index: 0,
             x: 0,
@@ -122,6 +122,7 @@ let PushPlayChess = cc.Class({
         this.act = "playChess";
         this.uid = 0;
         this.cid = 0;
+        this.winner = 0;           // 赢家uid
         this.dest = {
             index: 0,
             x: 0,
@@ -226,10 +227,20 @@ let LoginResponse = cc.Class({
          */
         this.token = '';
 
-        /**
-         * 用json object表示的一个player对象，字段说明参见player json对象
-         */
-        this.me = {};
+        this.self = {
+            isBlack: false,
+            chessDic: {}
+        };
+
+        this.other = {
+            isBlack: false,
+            chessDic: {},
+            uid: 0
+        };
+
+        this.order = 0;
+
+        this.isReconn = false;  // 是否断线重连
 
     }
 });

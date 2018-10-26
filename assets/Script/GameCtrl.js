@@ -10,6 +10,8 @@
 
 let DataMgr = require("./common/DataMgr");
 
+const bedPos = [cc.v2(-316,316),cc.v2(316,316),cc.v2(-316,-316),cc.v2(316,-316),cc.v2(0,0)];
+
 cc.Class({
     extends: cc.Component,
 
@@ -26,14 +28,6 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        this.curChess = null;
-        this.desBed = null;
-        this.bedFlag = {};
-        this.bedArr = [];
-        this.chessArr = [];
-        this.isBlack = false;    // 是否黑色
-        this.order = false;      // 是否轮到自己走棋
-
         this.listenEvent();
     },
 
@@ -56,6 +50,10 @@ cc.Class({
 
     onPlayChess(event){
         let resp = event.detail;
+        if (resp.err != 0){
+            cc.log("错误，不能移动。");
+            return;
+        }
 
         let moveChess = this.chessArr[resp.cid];
         let uid = DataMgr.getInstance().playerObj.uid;
@@ -70,8 +68,22 @@ cc.Class({
             moveChess.node.runAction(cc.moveTo(0.2, cc.v2(resp.dest.x, resp.dest.y)));
         }
 
+        this.curChess = null;
         this.order = uid==resp.order;
         this._updatePlayTip();
+
+        if (resp.winner){
+            this.scheduleOnce((dt)=>{
+                cc.log("game over, " + resp.winner + " win.");
+                let txt = "你赢了！";
+                if (resp.winner != uid){
+                    txt = "你输了!";
+                }
+                Global.tips.show(txt, ()=>{
+                    this.getComponent("MenuCtrl").showMenuLayer();
+                });
+            }, 1);
+        }
 
     },
 
@@ -95,7 +107,7 @@ cc.Class({
     onBedTouch(event){
         let bed = event.detail;
         this.desBed = bed;
-        this.moveChessToBed(bed);
+        this.requestMoveChessToBed(bed);
     },
 
     /**
@@ -108,10 +120,10 @@ cc.Class({
     },
 
     /**
-     * 移动到指定位置
+     * 请求移动到指定位置
      * @param {ChessBedCtrl} desBed 
      */
-    moveChessToBed(desBed){
+    requestMoveChessToBed(desBed){
         if (!this.order) return;
         if (!this.curChess) return;
         if (!this.getIsCanMove(desBed)) return;
@@ -119,6 +131,7 @@ cc.Class({
         // todo: 向服务器请求移动
         Global.netProxy.playChess({
             cid: this.curChess.cid,
+            lastBedIndex: this.curChess.lastBedIndex,
             dest: {
                 index: desBed.index,
                 x: desBed.x,
@@ -162,8 +175,17 @@ cc.Class({
         return res;
     },
 
-    initChessLayer(info){
-        let bedPos = [cc.v2(-316,316),cc.v2(316,316),cc.v2(-316,-316),cc.v2(316,-316),cc.v2(0,0)];
+    clearChessboard(){
+        this.curChess = null;
+        this.desBed = null;
+        this.bedFlag = {};
+        this.bedArr = [];
+        this.chessArr = [];
+        this.isBlack = false;    // 是否黑色
+        this.order = false;      // 是否轮到自己走棋
+        this.chessLayer.removeAllChildren(true);
+
+        // 棋盘坐标节点 用来定位点击
         for (let i=0; i<bedPos.length; i++){
             let bed = cc.instantiate(this.chessBedPrefab);
             bed.setPosition(bedPos[i]);
@@ -172,6 +194,11 @@ cc.Class({
             this.bedArr.push(bedCtrl);
             this.chessLayer.addChild(bed);
         }
+    },
+
+    startNewGame(info){
+        this.clearChessboard();
+
         // 黑棋在下方
         for (let j=0; j<4; j++){
             let chess = cc.instantiate(this.chessPrefab);
@@ -189,23 +216,52 @@ cc.Class({
             this.chessLayer.addChild(chess);
         }
 
-
         if (DataMgr.getInstance().playerObj.uid == info.black){
             this.isBlack = true;
             this.order = true;
-            this.labelOtherUid.string = "对手: " + "白色 uid: " + info.other;
 
-            cc.log("self is balck");
         } else {
             this.isBlack = false;
             this.order = false;
-            this.chessLayer.scaleY = -1;
-            this.labelOtherUid.string = "对手: " + "黑色 uid: " +  info.black;
-
-            cc.log("self is white");
+            // this.chessLayer.scaleY = -1;
         }
         this._updatePlayTip();
         this.labelSelfUid.string = "我方 : " + (this.isBlack?"黑色":"白色") + DataMgr.getInstance().playerObj.uid;
+        this.labelOtherUid.string = "对手: " + (!this.isBlack?"黑色":"白色") + info.other;
+    },
+
+    onReconn(resp){
+        this.clearChessboard();
+
+        let uid = DataMgr.getInstance().playerObj.uid;
+        this.order = uid == resp.order;
+
+        let self = resp.self;
+        let other = resp.other;
+
+        this.isBlack = self.isBlack;
+
+        this.labelOtherUid.string = "对手: " + (!this.isBlack?"黑色":"白色")   +  resp.other.uid;
+        this.labelSelfUid.string = "我方: " + (this.isBlack?"黑色":"白色") + uid;
+        this._updatePlayTip();
+
+        createChess.call(this, self.chessDic);
+        createChess.call(this, other.chessDic);
+
+        function createChess(chessDic){
+            for (let cid in chessDic){
+                let cobj = chessDic[parseInt(cid)];
+                let chess = cc.instantiate(this.chessPrefab);
+                let chessCtrl = chess.getComponent("ChessCtrl");
+                chessCtrl.isBlack = cobj.isBlack;
+                let bed = this.bedArr[cobj.lastBedIndex];
+                chessCtrl.lastBedIndex = bed.index;
+                chessCtrl.cid = cobj.cid;
+                chess.setPosition(cc.v2(bed.x, bed.y));
+                this.chessArr[parseInt(cid)] = (chessCtrl);
+                this.chessLayer.addChild(chess);
+            }
+        }
     }
 
     // update (dt) {},

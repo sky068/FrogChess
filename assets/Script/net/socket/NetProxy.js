@@ -82,6 +82,23 @@ let NetProxy = cc.Class({
     },
 
     /**
+     * 注册推送
+     * @param {String} key
+     * @param {function(resp)} cb
+     */
+    registerPush(key, cb){
+        let self = this;
+        let pushCallback = function (resp) {
+            if (cb){
+                cb(resp);
+            }
+            Global.eventMgr.emit(resp.act, resp);
+        };
+
+        this.network.registerPushResponseCallback(key, pushCallback);
+    },
+
+    /**
      * 处理缓存push
      */
     dealCachePush: function () {
@@ -108,17 +125,18 @@ let NetProxy = cc.Class({
     },
 
     // 开始随机匹配
-    randomMatch: function (callback) {
+    randomMatch: function () {
         let req = new GameProtocols.RandomMatchRequest();
         let uid = DataMgr.getInstance().playerObj.uid;
         req.uid = uid;
-        this.network.sendRequest(req, callback);
+        this.network.sendRequest(req);
     },
 
     playChess: function (msg) {
         let req = new GameProtocols.PlayChessRequest();
         let uid = DataMgr.getInstance().playerObj.uid;
         req.uid = uid;
+        req.lastBedIndex = msg.lastBedIndex;
         req.cid = msg.cid;
         req.dest = msg.dest;
         this.network.sendRequest(req);
@@ -221,28 +239,6 @@ let NetProxy = cc.Class({
         //     //绑定成功后删除本地token
         //     farm.localStorage.removeItem(farm.game.gmConst.GLS_KEY_GUEST_TOKEN);
         //     farm.eventManager.emit(farm.game.gmConst.SP_EVENT_BIND_FACEBOOK_SUCCESS);
-        // };
-        // this.network.sendRequest(req, callback);
-    },
-
-    /**
-     * 启动转盘
-     */
-    spin: function (x) {
-        // let req = new GameProtocols.SpinRequest();
-        // if(farm.util.isNumber(x)){
-        //     req.x = x;
-        // }
-        // var callback =  function (resp) {
-        //     if(resp.err != 0){
-        //         cc.log("网络请求---spin 失败");
-        //         farm.eventManager.emit(farm.game.gmConst.SP_EVENT_SPIN_FAILED, resp);
-        //         return;
-        //     }
-        //     cc.log("网络请求---spin 成功");
-        //     farm.game.player.parse(resp.me);
-        //     farm.game.spTimer.updateSpTime(resp.spStepLeftTime, resp.spInterval);
-        //     farm.eventManager.emit(farm.game.gmConst.SP_EVENT_SPIN_SUCCESS, resp);
         // };
         // this.network.sendRequest(req, callback);
     },

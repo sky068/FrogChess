@@ -34,20 +34,26 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
+        this.cb = null;
     },
 
     start () {
 
     },
 
-    show(content){
+    show(content, cb){
         this.content.string = content;
         this.btnOk.active = true;
         this.node.active = true;
+        this.cb = cb;
     },
 
     onBtnOk(){
         this.node.active = false;
+        if (this.cb){
+            this.cb();
+            this.cb = null;
+        }
     },
 
     showLoading(){
