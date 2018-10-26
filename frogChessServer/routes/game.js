@@ -108,6 +108,8 @@ class Game {
         let rid = socket.rid;
         if (uid){
             delete ONLINE_USER_DIC[uid.toString()];
+            // 如果在匹配队列则移除队列
+            this.exitRandomMatchPool(uid);
         }
 
         // 已经在游戏中，通知对方已经掉线
@@ -165,9 +167,9 @@ class Game {
         socket.send(JSON.stringify(resp));
     }
     
-    exitRandomMatchPool(user){
+    exitRandomMatchPool(uid){
         for (let index=0; index<RANDOM_USER_POOL.length; index++){
-            if (RANDOM_USER_POOL[index].socket == user.socket){
+            if (RANDOM_USER_POOL[index].uid == uid){
                 RANDOM_USER_POOL.splice(index,1);
             }
         }
@@ -244,7 +246,7 @@ class Game {
                 user.socket.send(JSON.stringify(resp));
     
                 // 离开随机匹配池
-                Game.getInstance().exitRandomMatchPool(user);
+                Game.getInstance().exitRandomMatchPool(user.uid);
             }, MATCH_WAIT_TIME * 1000);
         }
     }
